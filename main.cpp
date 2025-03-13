@@ -12,6 +12,7 @@ const unsigned int PLAYER_VELOCITY = 5;
 const unsigned int BALL_RADIUS = 10;
 
 bool gameOver = false;
+unsigned int winner = 0;
 float ballXVel = 0.095f;
 float ballYVel = 0.07f;
 
@@ -113,7 +114,19 @@ void showVictory() {
     SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 
-    SDL_Rect rect = { 100, 100, 100, 100 };
+    unsigned int xPos;
+    unsigned int yPos = SCREEN_HEIGHT * (1.0f / 5.0f);  // Ensure floating point division
+    unsigned int height = 100;
+    unsigned int width = 100;
+
+    if (winner == 2) {
+        xPos = (SCREEN_WIDTH / 4.0f) - (width / 2.0f);
+    }
+    else {
+        xPos = (SCREEN_WIDTH * (3.0f / 4.0f)) - (width / 2.0f);
+    }
+
+    SDL_Rect rect = { (int)xPos, (int)yPos, (int)width, (int)height };
     SDL_RenderCopy(renderer, texture, NULL, &rect);
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(texture);
@@ -145,6 +158,14 @@ void moveBall(Ball& ball) {
 
     if (ball.x - BALL_RADIUS <= 0 || ball.x + BALL_RADIUS >= SCREEN_WIDTH) { // ball collides with left or right wall
         gameOver = true;
+
+        // check who is the winner
+        if (ball.x > SCREEN_WIDTH / 2) {
+            winner = 2;
+        }
+        else {
+            winner = 1;
+        }
     }
 }
 
