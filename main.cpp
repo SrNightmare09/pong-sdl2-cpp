@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include <string>
 
 const unsigned int SCREEN_WIDTH = 740;
 const unsigned int SCREEN_HEIGHT = 320;
@@ -19,7 +20,7 @@ typedef struct {
     float y;
 } Ball;
 
-SDL_Window * window = NULL;
+SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 SDL_Rect player1;
 SDL_Rect player2;
@@ -29,6 +30,7 @@ void close();
 void movePlayer(SDL_Rect& player, int key);
 void drawBall(Ball ball);
 void moveBall(Ball& ball);
+void showVictory();
 
 int main(int argc, char* args[]) {
 
@@ -48,6 +50,7 @@ int main(int argc, char* args[]) {
                 if (e.type == SDL_QUIT) {
                     quit = true;
                 }
+
                 else if (e.type == SDL_KEYDOWN && !gameOver) {
                     int key = e.key.keysym.sym;
 
@@ -62,34 +65,58 @@ int main(int argc, char* args[]) {
                 }
             }
 
-            SDL_SetRenderDrawColor(renderer, 31, 31, 31, 255); // background -> dark
-            SDL_RenderClear(renderer);
+            if (!gameOver) {
+                SDL_SetRenderDrawColor(renderer, 31, 31, 31, 255); // background -> dark
+                SDL_RenderClear(renderer);
 
-            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // ball -> green
-            drawBall(ball);
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // ball -> green
+                drawBall(ball);
 
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            unsigned int y_coord = 0;
-            for (unsigned int i = 0; i < 100; i++) {
-                SDL_Rect rect = { SCREEN_WIDTH / 2, (int)y_coord, MIDLINE_WIDTH, MIDLINE_HEIGHT };
-                SDL_RenderFillRect(renderer, &rect);
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                unsigned int y_coord = 0;
+                for (unsigned int i = 0; i < 100; i++) {
+                    SDL_Rect rect = { SCREEN_WIDTH / 2, (int)y_coord, MIDLINE_WIDTH, MIDLINE_HEIGHT };
+                    SDL_RenderFillRect(renderer, &rect);
 
-                y_coord += MIDLINE_HEIGHT + 10;
+                    y_coord += MIDLINE_HEIGHT + 10;
+                }
+
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // player 1 -> red
+                SDL_RenderFillRect(renderer, &player1);
+
+                SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // player 2 -> blue
+                SDL_RenderFillRect(renderer, &player2);
+
+                moveBall(ball);
+
+                SDL_RenderPresent(renderer);
             }
-
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // player 1 -> red
-            SDL_RenderFillRect(renderer, &player1);
-
-            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // player 2 -> blue
-            SDL_RenderFillRect(renderer, &player2);
-
-            moveBall(ball);
-
-            SDL_RenderPresent(renderer);
+            else {
+                ballXVel = 0;
+                ballYVel = 0;
+                showVictory();
+            }
         }
     }
     close();
     return 0;
+}
+
+void showVictory() {
+    std::string path = "assets/trophy.bmp";
+    SDL_Surface* surface = SDL_LoadBMP(path.c_str()); // Path to your image
+    if (!surface) {
+        printf("Failed to load trophy image: %s\n", SDL_GetError());
+        return;
+    }
+
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+
+    SDL_Rect rect = { 100, 100, 100, 100 };
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_RenderPresent(renderer);
+    SDL_DestroyTexture(texture);
 }
 
 void moveBall(Ball& ball) {
@@ -118,8 +145,6 @@ void moveBall(Ball& ball) {
 
     if (ball.x - BALL_RADIUS <= 0 || ball.x + BALL_RADIUS >= SCREEN_WIDTH) { // ball collides with left or right wall
         gameOver = true;
-        ballXVel = 0;
-        ballYVel = 0;
     }
 }
 
