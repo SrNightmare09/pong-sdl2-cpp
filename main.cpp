@@ -35,6 +35,7 @@ void drawBall(Ball ball);
 void moveBall(Ball& ball);
 void showVictory();
 int getRandomNumber(int lower, int upper);
+void rndBallVelocity();
 
 int main(int argc, char* args[]) {
 
@@ -48,6 +49,7 @@ int main(int argc, char* args[]) {
         player1 = { 0, SCREEN_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT };
         player2 = { SCREEN_WIDTH - PLAYER_WIDTH, SCREEN_HEIGHT / 2, PLAYER_HEIGHT, PLAYER_HEIGHT };
         Ball ball = { SCREEN_WIDTH / 2, (float)getRandomNumber(BALL_RADIUS + 10, SCREEN_HEIGHT - BALL_RADIUS - 10) };
+        rndBallVelocity();
 
         while (!quit) {
             while (SDL_PollEvent(&e)) {
@@ -104,6 +106,14 @@ int main(int argc, char* args[]) {
     }
     close();
     return 0;
+}
+
+void rndBallVelocity() {
+    int rnd1 = getRandomNumber(1, 100);
+    int rnd2 = getRandomNumber(1, 100);
+
+    ballXVel = (rnd1 % 2 == 0) ? ballXVel : -ballXVel;
+    ballYVel = (rnd2 % 2 == 0) ? ballYVel : -ballYVel;
 }
 
 void showVictory() {
