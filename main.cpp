@@ -1,6 +1,8 @@
 #include <stdio.h>
-#include <SDL2/SDL.h>
 #include <string>
+#include <random>
+
+#include <SDL2/SDL.h>
 
 const unsigned int SCREEN_WIDTH = 740;
 const unsigned int SCREEN_HEIGHT = 320;
@@ -32,6 +34,7 @@ void movePlayer(SDL_Rect& player, int key);
 void drawBall(Ball ball);
 void moveBall(Ball& ball);
 void showVictory();
+int getRandomNumber(int lower, int upper);
 
 int main(int argc, char* args[]) {
 
@@ -44,7 +47,7 @@ int main(int argc, char* args[]) {
 
         player1 = { 0, SCREEN_HEIGHT / 2, PLAYER_WIDTH, PLAYER_HEIGHT };
         player2 = { SCREEN_WIDTH - PLAYER_WIDTH, SCREEN_HEIGHT / 2, PLAYER_HEIGHT, PLAYER_HEIGHT };
-        Ball ball = { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 };
+        Ball ball = { SCREEN_WIDTH / 2, (float)getRandomNumber(BALL_RADIUS + 10, SCREEN_HEIGHT - BALL_RADIUS - 10) };
 
         while (!quit) {
             while (SDL_PollEvent(&e)) {
@@ -233,6 +236,17 @@ bool init() {
         success = false;
     }
     return success;
+}
+
+int getRandomNumber(int lower, int upper) {
+    // R -> [lower, upper]
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(lower, upper);
+
+    int random_number = dist(gen);
+    return random_number;
 }
 
 void close() {
