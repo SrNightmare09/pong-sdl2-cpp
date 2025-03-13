@@ -5,5 +5,5 @@
 - sound effects
 - multiple inputs at same time
 - mousehover input
-- restart button
+- restart button, points system
 - ball gets faster
